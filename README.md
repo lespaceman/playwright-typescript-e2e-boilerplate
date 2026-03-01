@@ -9,24 +9,52 @@ git clone git@github.com:lespaceman/playwright-typescript-e2e-boilerplate.git
 cd playwright-typescript-e2e-boilerplate
 npm install
 npx playwright install --with-deps chromium
+cp .env.example .env   # add your credentials
 npm test
 ```
+
+## Authentication Setup
+
+This boilerplate includes role-based authentication. Tests run with pre-saved sessions instead of logging in every time.
+
+### Setup
+
+1. Copy `.env.example` to `.env` and fill in your credentials:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Customize the login selectors in `tests/auth.setup.ts` for your app's login form
+
+3. Run tests — the `setup` project logs in first, then browser projects reuse the saved session:
+   ```bash
+   npm test
+   ```
+
+### How it works
+
+- `tests/auth.setup.ts` logs in as `admin` and `installer`, saving cookies to `playwright/.auth/`
+- Browser projects load these cookies via `storageState` in `playwright.config.ts`
+- Credentials come from `.env` (gitignored) — see `.env.example` for the template
+- Session files in `playwright/.auth/` are also gitignored
 
 ## Project Structure
 
 ```
-├── playwright.config.ts    # Playwright configuration (baseURL, browsers, reporters)
-├── tsconfig.json           # TypeScript configuration with path aliases
+├── .env.example           # Environment variable template for credentials
+├── playwright.config.ts   # Playwright configuration (baseURL, browsers, reporters)
+├── tsconfig.json          # TypeScript configuration with path aliases
 ├── fixtures/
-│   └── index.ts            # Custom test fixtures — extend with your page objects
+│   └── index.ts           # Custom test fixtures — extend with your page objects
 ├── pages/
-│   ├── BasePage.ts         # Base page class with common utilities
-│   └── ExamplePage.ts     # Example page object (delete for your project)
+│   ├── BasePage.ts        # Base page class with common utilities
+│   └── ExamplePage.ts    # Example page object (delete for your project)
 ├── tests/
+│   ├── auth.setup.ts          # Authentication setup (login + save sessions)
 │   ├── example-domains.spec.ts  # Example tests (delete for your project)
 │   └── navigation.spec.ts      # Example tests (delete for your project)
 └── utils/
-    └── helpers.ts          # Utility functions (random data, cookie consent, scroll)
+    └── helpers.ts         # Utility functions (random data, cookie consent, scroll)
 ```
 
 ## Conventions
@@ -61,10 +89,12 @@ npm test
 ## Customizing for Your Project
 
 1. Update `baseURL` in `playwright.config.ts`
-2. Delete `pages/ExamplePage.ts` and `tests/*.spec.ts`
-3. Add your page objects in `pages/`
-4. Register them as fixtures in `fixtures/index.ts`
-5. Write tests in `tests/`
+2. Copy `.env.example` to `.env` and add your credentials
+3. Customize login selectors in `tests/auth.setup.ts`
+4. Delete `pages/ExamplePage.ts` and `tests/*.spec.ts`
+5. Add your page objects in `pages/`
+6. Register them as fixtures in `fixtures/index.ts`
+7. Write tests in `tests/`
 
 ## License
 
